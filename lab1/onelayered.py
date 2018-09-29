@@ -10,18 +10,17 @@ def check(w):
     newPoints = [[1, random.uniform(-5, 5), random.uniform(-5, 5)], [1, random.uniform(-5, 5), random.uniform(-5, 5)],
                 [1, random.uniform(-5, 5), random.uniform(-5, 5)]]
     for i in range(len(newPoints)):
-        curr = 0.0
+        net = 0.0
         for j in range(len(w)):
-            curr += w[j] * newPoints[i][j]
+            net += w[j] * newPoints[i][j]
         plt.scatter(newPoints[i][1], newPoints[i][2], c='b')
-        # print("point: " + str(newPoints[i][1]) + ";" + str(newPoints[i][2]) + ",  curr: " + str(curr))
-        if curr >= 0:
+        # print("point: " + str(newPoints[i][1]) + ";" + str(newPoints[i][2]) + ",  net: " + str(net))
+        if net >= 0:
             plt.text(newPoints[i][1], newPoints[i][2], '1: (' + str(round(newPoints[i][1], 2)) + ';' + str(round(newPoints[i][2], 2)) + ')')
         else:
             plt.text(newPoints[i][1], newPoints[i][2], '0: (' + str(round(newPoints[i][1], 2)) + ';' + str(round(newPoints[i][2], 2)) + ')')
 
-
-def draw(w):
+def draw(w, b):
     for i in range(len(values)):
         if answers[i] == 0:
             plt.scatter(values[i][1], values[i][2], c='r')
@@ -32,7 +31,10 @@ def draw(w):
 
     x=np.arange(-5,5,0.02)
     plt.plot(x,(-w[0] - w[1] * x) / w[2])
-    check(w)
+    plt.text(-5, (-w[0] - w[1] * (-5)) / w[2], 'plot: y=' + str(round(-w[1] / w[2], 2)) + 'x+'
+             + str(round(-w[0] / w[2], 2)))
+    if b == 1:
+        check(w)
 
     plt.grid(True)
     plt.show()
@@ -43,12 +45,13 @@ def initWeight():
         w[i] = random.uniform(-2, 2)
     return w
 
-
-def train(w):
+def train(w, s):
+    if s == 0:
+        answers[2] = 0
     eps = 1.0
     steps = 0
     while eps > 0:
-        # eps = 0
+        eps = 0
         for i in range(len(values)):
             curr = 0.0
             for j in range(len(w)):
@@ -67,14 +70,19 @@ def train(w):
         if steps > 500:
             print("Can not train perceptron")
             break
+    print("steps: " + str(steps))
     return w
 
 def main():
     w = initWeight()
-    w = train(w)
+    # set s = 0 for nonseparable points
+    s = 1
+    w = train(w, s)
     print("final weights: ")
     for i in range(len(w)):
         print(w[i])
-    draw(w)
+    # set b = 1 to draw with checking random points
+    b = 1
+    draw(w, b)
 
 main()
